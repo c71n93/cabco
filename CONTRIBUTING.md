@@ -63,11 +63,11 @@ checks that documentation is present; reviewers still assess its quality.
 The package configures `missing_docs` in `Cargo.toml` so Cargo checks fail if
 public API documentation is missing.
 The Public API documentation workflow runs on pull requests and pushes to
-`master`, using Rust 1.86.0 with Clippy. Run the same check locally from the
+`master`, using stable Rust with Clippy. Run the same check locally from the
 repository root with that toolchain selected:
 
 ```sh
-cargo clippy --all-targets --all-features -- -D missing_docs
+cargo +stable clippy --all-targets --all-features -- -D missing_docs
 ```
 
 The command checks all targets with all features enabled and fails if public
