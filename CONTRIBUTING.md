@@ -48,6 +48,35 @@ The check runs when a pull request is opened, reopened, edited, or updated. It
 validates the current source branch, title, and description. It does not inspect
 individual commits and does not run for direct pushes.
 
+## Rust public API documentation
+
+Document externally reachable Rust public items with Rustdoc comments (`///`),
+and document the crate with `//!`. This includes public structs, methods,
+functions, fields, enums and variants, traits, modules, and re-exported public
+API covered by Rust's built-in `missing_docs` lint. Private and crate-visible
+items are outside this requirement.
+
+Describe the existing contract using the vocabulary in [CONTEXT.md](CONTEXT.md):
+valid inputs, outputs, errors, and observable behavior where relevant. The lint
+checks that documentation is present; reviewers still assess its quality.
+
+Once a root `Cargo.toml` exists, the Public API documentation workflow runs on
+pull requests and pushes to `master`, using Rust 1.86.0 with Clippy. Run the same
+check locally from the repository root with that toolchain selected:
+
+```sh
+cargo clippy --all-targets --all-features -- -D missing_docs
+```
+
+The command denies Rust's built-in `missing_docs` lint for all targets and
+features through Clippy, so an undocumented covered public item fails the check.
+
+The current `master` branch has no Rust crate. Until a root `Cargo.toml` is
+added, the workflow skips Rust installation and Clippy, and reports in the job
+summary that public API documentation enforcement is inactive. Adding the
+package's Cargo lint configuration and documenting its public API remain work
+for when the Rust crate is introduced; this workflow prepares the CI check.
+
 ## Review commits and merging
 
 Use commits that help reviewers follow the work. Temporary subjects such as
