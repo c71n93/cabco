@@ -60,22 +60,18 @@ Describe the existing contract using the vocabulary in [CONTEXT.md](CONTEXT.md):
 valid inputs, outputs, errors, and observable behavior where relevant. The lint
 checks that documentation is present; reviewers still assess its quality.
 
-Once a root `Cargo.toml` exists, the Public API documentation workflow runs on
-pull requests and pushes to `master`, using Rust 1.86.0 with Clippy. Run the same
-check locally from the repository root with that toolchain selected:
+The package configures `missing_docs` in `Cargo.toml` so Cargo checks fail if
+public API documentation is missing.
+The Public API documentation workflow runs on pull requests and pushes to
+`master`, using Rust 1.86.0 with Clippy. Run the same check locally from the
+repository root with that toolchain selected:
 
 ```sh
 cargo clippy --all-targets --all-features -- -D missing_docs
 ```
 
-The command denies Rust's built-in `missing_docs` lint for all targets and
-features through Clippy, so an undocumented covered public item fails the check.
-
-The current `master` branch has no Rust crate. Until a root `Cargo.toml` is
-added, the workflow skips Rust installation and Clippy, and reports in the job
-summary that public API documentation enforcement is inactive. Adding the
-package's Cargo lint configuration and documenting its public API remain work
-for when the Rust crate is introduced; this workflow prepares the CI check.
+The command checks all targets with all features enabled and fails if public
+API documentation is missing.
 
 ## Review commits and merging
 
