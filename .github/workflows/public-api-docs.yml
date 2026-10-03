@@ -1,0 +1,23 @@
+name: Public API documentation
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  public-api-docs:
+    name: Check public API documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install stable Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - name: Check public API documentation
+        run: cargo clippy --all-targets --all-features -- -D missing_docs
