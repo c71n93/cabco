@@ -48,6 +48,16 @@ The check runs when a pull request is opened, reopened, edited, or updated. It
 validates the current source branch, title, and description. It does not inspect
 individual commits and does not run for direct pushes.
 
+## Pull request size
+
+Pull requests may contain at most 500 changed lines, counted as additions plus
+deletions. Only the repository-root `Cargo.lock` is excluded; tests,
+documentation, configuration, nested lockfiles, and all other files count. This
+maintenance ceiling applies regardless of maintenance ownership.
+
+Agents must plan smaller, coherent implementation increments, each accompanied
+by its relevant tests, rather than presenting an oversized change for review.
+
 ## Review commits and merging
 
 Use commits that help reviewers follow the work. Temporary subjects such as
