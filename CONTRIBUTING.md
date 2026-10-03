@@ -48,6 +48,15 @@ The check runs when a pull request is opened, reopened, edited, or updated. It
 validates the current source branch, title, and description. It does not inspect
 individual commits and does not run for direct pushes.
 
+## Pull request size
+
+Pull requests may contain at most 500 changed lines, counted as additions plus
+deletions, with some exclusions defined in the workflow configuration. This
+maintenance ceiling applies regardless of maintenance ownership.
+
+Agents must plan smaller, coherent implementation increments, each accompanied
+by its relevant tests, rather than presenting an oversized change for review.
+
 ## Rust public API documentation
 
 Document externally reachable Rust public items with Rustdoc comments (`///`),

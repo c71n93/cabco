@@ -1,0 +1,30 @@
+name: PR size
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+# pull_request_target supplies a writable token for fork PRs. This workflow must
+# never check out or execute code from the pull request.
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  enforce:
+    name: Enforce 500-line PR size limit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label PR and enforce size ceiling
+        # v1.12.0 paginates file counts when exclusions are configured.
+        uses: CodelyTV/pr-size-labeler@19c335e7695ba922de938806dd129f0a9b992644
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          xs_max_size: 10
+          s_max_size: 100
+          m_max_size: 250
+          # The action uses strict less-than thresholds, so 501 permits 500.
+          l_max_size: 501
+          fail_if_xl: true
+          files_to_ignore: Cargo.lock
+          message_if_xl: "This PR exceeds the limit of 500 counted lines (additions plus deletions, excluding only the root Cargo.lock). Please split it into smaller, coherent changes with their relevant tests."
