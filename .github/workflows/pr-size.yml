@@ -1,6 +1,6 @@
 name: PR size
 
-on:
+"on":
   pull_request_target:
     types: [opened, reopened, synchronize]
 
