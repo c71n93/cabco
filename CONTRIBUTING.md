@@ -51,8 +51,7 @@ individual commits and does not run for direct pushes.
 ## Pull request size
 
 Pull requests may contain at most 500 changed lines, counted as additions plus
-deletions. Only the repository-root `Cargo.lock` is excluded; tests,
-documentation, configuration, nested lockfiles, and all other files count. This
+deletions, with some exclusions defined in the workflow configuration. This
 maintenance ceiling applies regardless of maintenance ownership.
 
 Agents must plan smaller, coherent implementation increments, each accompanied
