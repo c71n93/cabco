@@ -30,3 +30,7 @@ _Avoid_: AI-written code as a synonym; code that humans cannot inspect or modify
 **Human-owned component**:
 A component whose implementation humans are expected to understand and whose implementation changes require human review. AI may still generate or modify its code.
 _Avoid_: Human-written code as a synonym; a prohibition on AI assistance.
+
+**Component policy**:
+The explicit description of components’ file membership, maintenance ownership, and interface boundaries that CABCO uses to determine which changes require human review. A component policy file stores this description.
+_Avoid_: Bare “declaration” as a synonym; contract file, which suggests behavioral guarantees beyond the component policy.
