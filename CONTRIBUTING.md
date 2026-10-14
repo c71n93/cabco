@@ -104,10 +104,6 @@ cargo +stable clippy --workspace --all-targets --all-features -- -D warnings -D 
 ```
 
 To apply formatting locally, run `cargo +stable fmt --all`, then rerun the checks.
-To verify the checks themselves, run `python3 scripts/verify-rust-checks.py`.
-It uses temporary copies of the crate to verify clean code passes, deliberate
-formatting and Clippy violations fail, formatting checks do not rewrite source,
-and missing public documentation still fails. It removes all probes on exit.
 
 Adding these workflows makes failures visible; it does not configure merge
 protection. For merge-blocking enforcement, select `Check Rust formatting` and
