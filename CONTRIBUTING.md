@@ -123,3 +123,34 @@ to the PR description. The merger can still edit that generated message after
 the check has run, so this policy prevents accidental formatting mistakes rather
 than deliberate owner overrides. The owner retains an emergency bypass for
 direct hotfixes and failed checks.
+
+## Rust function visibility order
+
+From the repository root, run the same pinned command as CI (requires Node/npm):
+
+```sh
+npx --yes --package @ast-grep/cli@0.50.0 ast-grep scan --rule .github/function-order.yml
+```
+
+Within each module and inherent `impl`, place bare `pub` functions first,
+restricted functions next (`pub(crate)`, `pub(super)`, `pub(in ancestor)`), and
+private functions last. `pub(self)` and `pub(in self)` are private. Preserve order
+within each group and move documentation and attributes with each function.
+
+Scopes are checked independently, even with unrelated declarations between
+functions. Traits, trait implementations, functions inside function bodies and
+macro expansions are excluded. Generated outputs under `target/` or `generated/`,
+`*.generated.rs`, and Git-ignored files are skipped. Source behind `cfg` attributes
+is checked regardless of the selected build configuration.
+
+Violations report the rule, file and line and exit with status 1. The check runs
+on pull requests and pushes to `master`; it does not rewrite source.
+For exceptional layouts, put a reason above a rule-specific suppression directly
+before the lower-visibility function (after its documentation and attributes):
+
+```rust
+// Reason: preserve a published example's layout.
+// ast-grep-ignore: rust-function-visibility-order
+fn helper() {}
+pub fn api() {}
+```
