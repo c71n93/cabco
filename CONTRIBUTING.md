@@ -82,6 +82,40 @@ cargo +stable clippy --all-targets --all-features -- -D missing_docs
 The command checks all targets with all features enabled and fails if public
 API documentation is missing.
 
+## Rust formatting and Clippy
+
+The Rust checks workflow runs on pull requests and pushes to `master`. Its
+`Check Rust formatting` job checks formatting across the workspace without
+rewriting files. Its `Check Clippy warnings` job checks the workspace, all targets,
+and all features, treating warnings as errors and explicitly retaining the
+missing-public-documentation requirement. The existing Public API documentation,
+PR naming, and PR size workflows remain in place.
+
+Toolchain policy: use the latest stable Rust release with rustfmt and Clippy,
+rather than a pinned compiler version. New stable releases can introduce
+formatting changes or new warnings. Update the local stable toolchain before
+reproducing CI failures, then run the same commands from the repository root:
+
+```sh
+rustup update stable
+rustup component add --toolchain stable rustfmt clippy
+cargo +stable fmt --all -- --check
+cargo +stable clippy --workspace --all-targets --all-features -- -D warnings -D missing_docs
+```
+
+To apply formatting locally, run `cargo +stable fmt --all`, then rerun the checks.
+To verify the checks themselves, run `python3 scripts/verify-rust-checks.py`.
+It uses temporary copies of the crate to verify clean code passes, deliberate
+formatting and Clippy violations fail, formatting checks do not rewrite source,
+and missing public documentation still fails. It removes all probes on exit.
+
+Adding these workflows makes failures visible; it does not configure merge
+protection. For merge-blocking enforcement, select `Check Rust formatting` and
+`Check Clippy warnings` as required status checks in branch protection or a
+ruleset, alongside any existing required checks (including
+`Check public API documentation`). This increment does not change repository
+protection settings.
+
 ## Review commits and merging
 
 Use commits that help reviewers follow the work. Temporary subjects such as
