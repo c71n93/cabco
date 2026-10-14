@@ -1,0 +1,35 @@
+name: Rust checks
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  formatting:
+    name: Check Rust formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install stable Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - name: Check Rust formatting
+        run: cargo +stable fmt --all -- --check
+
+  clippy:
+    name: Check Clippy warnings
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install stable Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - name: Check Clippy warnings
+        run: cargo +stable clippy --workspace --all-targets --all-features -- -D warnings -D missing_docs
