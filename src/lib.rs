@@ -96,10 +96,10 @@ impl Classification {
             .any(|entry| entry.status == Status::Review)
     }
 }
-/// Evaluate a collected comparison with no component policy in either snapshot.
+/// Evaluate consistent committed trees and changes with no component policy.
 ///
+/// # Errors
 /// Returns an error identifying the selected commit if a policy is present.
-/// Inputs must describe consistent committed trees and their changes.
 pub fn evaluate(input: CollectedComparison) -> Result<Classification, String> {
     for snapshot in [&input.before, &input.after] {
         if snapshot.policy.is_some() {

@@ -6,6 +6,11 @@ edition = "2024"
 [lints.rust]
 missing_docs = "deny"
 
+[lints.clippy]
+missing_errors_doc = "deny"
+missing_panics_doc = "deny"
+missing_safety_doc = "deny"
+
 [dependencies]
 clap = { version = "4", features = ["derive"] }
 

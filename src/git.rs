@@ -3,12 +3,12 @@ use crate::{Change, ChangeType, CollectedComparison, CollectedSnapshot};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-/// Collect two selected commits from a repository root or subdirectory.
+/// Collect two committed trees directly, with full IDs, complete file lists, and policy bytes.
+/// References must name commits; accepts a repository root or subdirectory.
+/// Ignores working-tree edits; moves are deletion plus creation. Never fetches or pushes.
 ///
-/// References must name commits. Returns full IDs, complete tracked path lists,
-/// policy bytes, and a direct tree comparison; ignores working-tree edits.
-/// Moves are deletion plus creation. Errors identify unreadable inputs, including
-/// paths that cannot be represented as UTF-8. Never fetches or pushes.
+/// # Errors
+/// Identifies unreadable inputs, including invalid refs and non-UTF-8 paths.
 pub fn collect(directory: &Path, base: &str, head: &str) -> Result<CollectedComparison, String> {
     let output = run(directory, &["rev-parse", "--show-toplevel"], "repository")?;
     let root = PathBuf::from(text(output, "repository")?.trim_end_matches('\n'));
