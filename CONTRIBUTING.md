@@ -81,8 +81,8 @@ pdd -f /dev/null
 ```
 
 The root `.pdd` file excludes build output, local environment files, Git metadata,
-and this guide's example. `.0pdd.yml` labels generated issues `agent-created` and
-`needs-triage`; a maintainer triages them before implementation.
+and this guide's example. `.0pdd.yml` labels generated issues `needs-triage`;
+a maintainer triages them before implementation.
 
 Repository administrators must keep an active GitHub webhook with payload URL
 `https://www.0pdd.com/hook/github`, content type `application/json`, SSL verification
