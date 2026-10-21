@@ -132,9 +132,17 @@ Clippy also requires structured Rustdoc sections for the applicable public API:
 
 These lints are individually denied in `Cargo.toml` and enforced by the existing
 Clippy workflows. They check section presence; reviewers must still assess
-whether the documented contract is accurate and complete. Describe argument and
-return-value semantics where useful; these lints do not require `# Arguments`
-or `# Returns` sections.
+whether the documented contract is accurate and complete.
+
+Follow the [Rust API Guidelines documentation convention](https://rust-lang.github.io/api-guidelines/documentation.html#function-docs-include-error-panic-and-safety-considerations-c-failure).
+Explain parameter meanings, relevant input constraints, return-value semantics,
+and observable guarantees in the API description, with examples where useful.
+Use the applicable `# Errors`, `# Panics`, and `# Safety` sections described above,
+including on trait methods where relevant. Dedicated `# Arguments` and
+`# Returns` sections and per-parameter bullet lists are not required.
+
+Keep this enforcement on stable Rust using the existing Rust and Clippy lints;
+reviewers assess semantic coverage and documentation quality.
 
 ## Rust formatting and Clippy
 
