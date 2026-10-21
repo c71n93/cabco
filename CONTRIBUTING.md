@@ -121,6 +121,21 @@ cargo +stable clippy --all-targets --all-features -- -D missing_docs
 The command checks all targets with all features enabled and fails if public
 API documentation is missing.
 
+Clippy also requires structured Rustdoc sections for the applicable public API:
+
+- `# Errors` describes failure conditions for functions returning `Result`
+  (`clippy::missing_errors_doc`).
+- `# Panics` describes panic conditions detected by Clippy
+  (`clippy::missing_panics_doc`).
+- `# Safety` describes the caller's obligations for unsafe functions and traits
+  (`clippy::missing_safety_doc`).
+
+These lints are individually denied in `Cargo.toml` and enforced by the existing
+Clippy workflows. They check section presence; reviewers must still assess
+whether the documented contract is accurate and complete. Describe argument and
+return-value semantics where useful; these lints do not require `# Arguments`
+or `# Returns` sections.
+
 ## Rust formatting and Clippy
 
 The Rust checks workflow runs on pull requests and pushes to `master`. Its
