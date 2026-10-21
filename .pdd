@@ -1,0 +1,4 @@
+--exclude=target/**
+--exclude=.git/**
+--exclude=.venv/**
+--exclude=CONTRIBUTING.md

@@ -57,6 +57,45 @@ maintenance ceiling applies regardless of maintenance ownership.
 Agents must plan smaller, coherent implementation increments, each accompanied
 by its relevant tests, rather than presenting an oversized change for review.
 
+## Deferred work with 0pdd
+
+[0pdd](https://github.com/yegor256/0pdd) turns source-code puzzles into GitHub
+issues. When deferring work, leave a comment that references the originating
+issue, estimates the effort, and describes the remaining work. For example:
+
+```rust
+// @todo #30:30min Describe the concrete remaining work and its acceptance criteria.
+```
+
+Replace the issue number and description with the real work being deferred.
+For multiline descriptions, indent continuation text one extra space after the
+comment prefix. See the [pdd syntax guide](https://github.com/cqfn/pdd#how-to-format).
+
+The `Check PDD puzzles` CI job validates puzzle formatting on pull requests and
+pushes to `master`. To run the same parser locally, install Ruby and libmagic,
+then run from the repository root:
+
+```sh
+gem install pdd
+pdd -f /dev/null
+```
+
+The root `.pdd` file excludes build output, local environment files, Git metadata,
+and this guide's example. `.0pdd.yml` labels generated issues `needs-triage`;
+a maintainer triages them before implementation.
+
+Repository administrators must keep an active GitHub webhook with payload URL
+`https://www.0pdd.com/hook/github`, content type `application/json`, SSL verification
+enabled, and only the `push` event selected. This webhook is already configured
+for this public repository; no bot invitation or Actions secret is required.
+GitHub webhook settings are separate from the files in this PR.
+
+After a puzzle reaches `master`, the webhook triggers 0pdd to open its issue.
+Remove the puzzle when the work is complete; 0pdd closes its issue after the
+removal reaches `master`. Avoid closing generated issues manually while their
+puzzles remain in the code. Check the README badge for puzzle status and the
+webhook's recent deliveries or 0pdd's commit comments when troubleshooting.
+
 ## Rust public API documentation
 
 Document externally reachable Rust public items with Rustdoc comments (`///`),
