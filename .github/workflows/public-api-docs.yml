@@ -22,7 +22,9 @@ jobs:
       - name: Check public API documentation
         run: cargo clippy --all-targets --all-features -- -D missing_docs
       - name: Install pinned Rustdoc JSON toolchain
-        uses: dtolnay/rust-toolchain@nightly-2025-07-30
+        uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8
+        with:
+          toolchain: nightly-2025-07-30
       - name: Test structured Rustdoc checker
         run: python3 -m unittest discover -s .github/rustdoc
       - name: Check structured Rustdoc
