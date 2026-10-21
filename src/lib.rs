@@ -1,5 +1,6 @@
 //! Evaluate immutable committed snapshots independently of Git collection and CLI output.
 use std::collections::{BTreeMap, BTreeSet};
+pub mod git;
 
 /// Complete tracked files and root policy at one full selected commit ID.
 #[derive(Debug)]
