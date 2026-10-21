@@ -1,0 +1,20 @@
+name: PDD puzzles
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  pdd:
+    name: Check PDD puzzles
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate puzzle format
+        uses: volodya-lombrozo/pdd-action@69842b56627431c5f232f5ea2dc2fca82f409c54

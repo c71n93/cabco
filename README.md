@@ -1,5 +1,7 @@
 # CABCO
 
+[![PDD status](https://www.0pdd.com/svg?name=c71n93/cabco)](https://www.0pdd.com/p?name=c71n93/cabco)
+
 **Code Autonomy Bounded by Component Ownership**
 
 CABCO is a project-level policy framework for controlling AI autonomy through explicit component ownership while keeping interfaces, contracts, and sensitive modules under human control.
