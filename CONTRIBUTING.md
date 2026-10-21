@@ -151,7 +151,8 @@ Panics, and Safety sections as required above.
 
 The documentation workflow also checks Arguments/Returns structure and parameter
 coverage using compiler-produced Rustdoc JSON. It checks the API Rustdoc exposes,
-including public re-exports, inherent methods, and trait declarations; private
+including public re-exports, exposed types' inherent methods, trait declarations,
+and APIs marked `doc(hidden)`; private
 and crate-visible items are excluded. Use top-level Markdown headings and a
 nonempty description in each required section. Parameter entries use a bullet,
 a backticked parameter name (or destructuring pattern as displayed by Rustdoc),
@@ -164,8 +165,9 @@ From the repository root, reproduce CI with Python 3 and:
 
 ```sh
 rustup toolchain install nightly-2025-07-30 --profile minimal
-cargo +nightly-2025-07-30 rustdoc --all-features --bin cabco -- -Z unstable-options --output-format json
+cargo +nightly-2025-07-30 rustdoc --all-features --bin cabco -- -Z unstable-options --output-format json --document-private-items --document-hidden-items
 python3 .github/rustdoc/check.py target/doc/cabco.json
+python3 -m unittest discover -s .github/rustdoc
 ```
 
 Run this generation and check for each library and binary target when adding

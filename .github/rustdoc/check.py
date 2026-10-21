@@ -12,7 +12,7 @@ def sections(docs):
     current = None
     fence = None
     for line in (docs or "").splitlines():
-        marker = re.match(r"^\s*(`{3,}|~{3,})", line)
+        marker = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
         if marker:
             token = marker[1]
             if fence is None:
@@ -83,6 +83,37 @@ def public_functions(document):
             )
         elif kind in ("struct", "enum", "union"):
             pending.extend(data["impls"])
+            if kind == "struct" and isinstance(data["kind"], dict):
+                fields = next(iter(data["kind"].values()))
+                if isinstance(fields, dict):
+                    fields = fields["fields"]
+                pending.extend(field for field in fields if field is not None
+                               and index[str(field)]["visibility"] == "public")
+            elif kind == "enum":
+                pending.extend(data["variants"])
+            elif kind == "union":
+                pending.extend(field for field in data["fields"]
+                               if index[str(field)]["visibility"] == "public")
+        elif kind == "variant":
+            fields = data["kind"]
+            if isinstance(fields, dict):
+                fields = next(iter(fields.values()))
+                if isinstance(fields, dict):
+                    fields = fields["fields"]
+                pending.extend(field for field in fields if field is not None)
+        if kind not in ("module", "impl", "use"):
+            pending.extend(type_references(data))
+
+
+def type_references(value):
+    if isinstance(value, dict):
+        if "id" in value and value["id"] is not None:
+            yield value["id"]
+        for child in value.values():
+            yield from type_references(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from type_references(child)
 
 
 def main():

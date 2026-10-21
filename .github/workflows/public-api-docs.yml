@@ -23,7 +23,9 @@ jobs:
         run: cargo clippy --all-targets --all-features -- -D missing_docs
       - name: Install pinned Rustdoc JSON toolchain
         uses: dtolnay/rust-toolchain@nightly-2025-07-30
+      - name: Test structured Rustdoc checker
+        run: python3 -m unittest discover -s .github/rustdoc
       - name: Check structured Rustdoc
         run: |
-          cargo +nightly-2025-07-30 rustdoc --all-features --bin cabco -- -Z unstable-options --output-format json
+          cargo +nightly-2025-07-30 rustdoc --all-features --bin cabco -- -Z unstable-options --output-format json --document-private-items --document-hidden-items
           python3 .github/rustdoc/check.py target/doc/cabco.json
