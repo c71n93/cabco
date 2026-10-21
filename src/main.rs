@@ -1,7 +1,7 @@
 //! Compare two committed trees and print their core evaluation.
 use std::process::ExitCode;
 
-use cabco::{Classification, Status, evaluate, git};
+use cabco::{Classification, Status, git};
 use clap::Parser;
 
 #[derive(Parser)]
@@ -30,13 +30,13 @@ fn run() -> Result<bool, String> {
     let Arguments::Check { base, head } = Arguments::parse();
     let directory = std::env::current_dir().map_err(|error| error.to_string())?;
     let input = git::collect(&directory, &base, &head)?;
-    let result = evaluate(input)?;
+    let result = input.evaluate()?;
     present(&result);
     Ok(result.requires_review())
 }
 
 fn present(result: &Classification) {
-    if result.paths.is_empty() {
+    if result.paths().next().is_none() {
         println!("AUTONOMOUS — no changed files");
         return;
     }
@@ -44,19 +44,16 @@ fn present(result: &Classification) {
         (Status::Review, "REVIEW"),
         (Status::Autonomous, "AUTONOMOUS"),
     ] {
-        let mut paths: Vec<&str> = result
-            .paths
-            .iter()
-            .filter(|path| path.status == status)
-            .map(|path| path.path.as_str())
+        let paths: Vec<_> = result
+            .paths()
+            .filter(|path| path.status() == status)
             .collect();
         if paths.is_empty() {
             continue;
         }
-        paths.sort_unstable();
         println!("{label} ({})", paths.len());
         for path in paths {
-            println!("{path}");
+            println!("{}", path.path());
         }
     }
 }
