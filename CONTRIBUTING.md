@@ -134,45 +134,15 @@ These lints are individually denied in `Cargo.toml` and enforced by the existing
 Clippy workflows. They check section presence; reviewers must still assess
 whether the documented contract is accurate and complete.
 
-Also require these sections on public functions and methods (including trait
-method declarations):
+Follow the [Rust API Guidelines documentation convention](https://rust-lang.github.io/api-guidelines/documentation.html#function-docs-include-error-panic-and-safety-considerations-c-failure).
+Explain parameter meanings, relevant input constraints, return-value semantics,
+and observable guarantees in the API description, with examples where useful.
+Use the applicable `# Errors`, `# Panics`, and `# Safety` sections described above,
+including on trait methods where relevant. Dedicated `# Arguments` and
+`# Returns` sections and per-parameter bullet lists are not required.
 
-- `# Arguments` for explicit parameters other than `self`. List each parameter
-  as a bullet with a backticked name and a description. Explain its meaning and
-  relevant constraints.
-- `# Returns` for a non-unit return type. Describe the returned value and its
-  observable guarantees. For `Result`, describe success here and failure under
-  `# Errors`.
-
-No Arguments section is required for a receiver alone or no parameters; no
-Returns section is required for implicit or explicit unit. Trait implementations
-inherit the trait contract and need not repeat it. Keep applicable Errors,
-Panics, and Safety sections as required above.
-
-The documentation workflow also checks Arguments/Returns structure and parameter
-coverage using compiler-produced Rustdoc JSON. It checks the API Rustdoc exposes,
-including public re-exports, exposed types' inherent methods, trait declarations,
-and APIs marked `doc(hidden)`; private
-and crate-visible items are excluded. Use top-level Markdown headings and a
-nonempty description in each required section. Parameter entries use a bullet,
-a backticked parameter name (or destructuring pattern as displayed by Rustdoc),
-a colon or dash, and a nonempty description. Headings inside fenced code blocks
-do not count. Reviewers still assess the descriptions' accuracy and completeness.
-
-Rustdoc JSON is unstable, so only this additional check uses a pinned nightly;
-the stable Rust, formatting, Clippy, and missing-docs checks remain required.
-From the repository root, reproduce CI with Python 3 and:
-
-```sh
-rustup toolchain install nightly-2025-07-30 --profile minimal
-cargo +nightly-2025-07-30 rustdoc --all-features --bin cabco -- -Z unstable-options --output-format json --document-private-items --document-hidden-items
-python3 .github/rustdoc/check.py target/doc/cabco.json
-python3 -m unittest discover -s .github/rustdoc
-```
-
-Run this generation and check for each library and binary target when adding
-one (use `--lib` for a library), and add it to the workflow. Update the pinned
-toolchain and checker's expected JSON format together when upgrading.
+Keep this enforcement on stable Rust using the existing Rust and Clippy lints;
+reviewers assess semantic coverage and documentation quality.
 
 ## Rust formatting and Clippy
 
