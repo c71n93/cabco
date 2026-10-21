@@ -3,22 +3,22 @@ use crate::{Change, ChangeType, CollectedComparison, CollectedSnapshot};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-fn run(root: &Path, arguments: &[&str], input: &str) -> Result<Vec<u8>, String> {
-    let output = Command::new("git")
-        .current_dir(root)
-        .args(arguments)
-        .output()
-        .map_err(|error| format!("cannot read {input:?} in {}: {error}", root.display()))?;
-    if !output.status.success() {
-        return Err(format!(
-            "Git operation failed for {input:?}: {}",
-            String::from_utf8_lossy(&output.stderr).trim()
-        ));
-    }
-    Ok(output.stdout)
-}
-fn text(bytes: Vec<u8>, input: &str) -> Result<String, String> {
-    String::from_utf8(bytes).map_err(|_| format!("non-UTF-8 Git output for {input:?}"))
+/// Collect two selected commits from a repository root or subdirectory.
+///
+/// References must name commits. Returns full IDs, complete tracked path lists,
+/// policy bytes, and a direct tree comparison; ignores working-tree edits.
+/// Moves are deletion plus creation. Errors identify unreadable inputs, including
+/// paths that cannot be represented as UTF-8. Never fetches or pushes.
+pub fn collect(directory: &Path, base: &str, head: &str) -> Result<CollectedComparison, String> {
+    let output = run(directory, &["rev-parse", "--show-toplevel"], "repository")?;
+    let root = PathBuf::from(text(output, "repository")?.trim_end_matches('\n'));
+    let base = resolve(&root, base)?;
+    let head = resolve(&root, head)?;
+    Ok(CollectedComparison {
+        changes: changes(&root, &base, &head)?,
+        before: snapshot(&root, base)?,
+        after: snapshot(&root, head)?,
+    })
 }
 fn resolve(root: &Path, reference: &str) -> Result<String, String> {
     let commit = format!("{reference}^{{commit}}");
@@ -81,20 +81,20 @@ fn changes(root: &Path, base: &str, head: &str) -> Result<Vec<Change>, String> {
         })
         .collect()
 }
-/// Collect two selected commits from a repository root or subdirectory.
-///
-/// References must name commits. Returns full IDs, complete tracked path lists,
-/// policy bytes, and a direct tree comparison; ignores working-tree edits.
-/// Moves are deletion plus creation. Errors identify unreadable inputs, including
-/// paths that cannot be represented as UTF-8. Never fetches or pushes.
-pub fn collect(directory: &Path, base: &str, head: &str) -> Result<CollectedComparison, String> {
-    let output = run(directory, &["rev-parse", "--show-toplevel"], "repository")?;
-    let root = PathBuf::from(text(output, "repository")?.trim_end_matches('\n'));
-    let base = resolve(&root, base)?;
-    let head = resolve(&root, head)?;
-    Ok(CollectedComparison {
-        changes: changes(&root, &base, &head)?,
-        before: snapshot(&root, base)?,
-        after: snapshot(&root, head)?,
-    })
+fn run(root: &Path, arguments: &[&str], input: &str) -> Result<Vec<u8>, String> {
+    let output = Command::new("git")
+        .current_dir(root)
+        .args(arguments)
+        .output()
+        .map_err(|error| format!("cannot read {input:?} in {}: {error}", root.display()))?;
+    if !output.status.success() {
+        return Err(format!(
+            "Git operation failed for {input:?}: {}",
+            String::from_utf8_lossy(&output.stderr).trim()
+        ));
+    }
+    Ok(output.stdout)
+}
+fn text(bytes: Vec<u8>, input: &str) -> Result<String, String> {
+    String::from_utf8(bytes).map_err(|_| format!("non-UTF-8 Git output for {input:?}"))
 }

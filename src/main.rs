@@ -15,6 +15,26 @@ enum Arguments {
     },
 }
 
+fn main() -> ExitCode {
+    match run() {
+        Ok(false) => ExitCode::SUCCESS,
+        Ok(true) => ExitCode::from(1),
+        Err(error) => {
+            eprintln!("error: {error}");
+            ExitCode::from(2)
+        }
+    }
+}
+
+fn run() -> Result<bool, String> {
+    let Arguments::Check { base, head } = Arguments::parse();
+    let directory = std::env::current_dir().map_err(|error| error.to_string())?;
+    let input = git::collect(&directory, &base, &head)?;
+    let result = evaluate(input)?;
+    present(&result);
+    Ok(result.requires_review())
+}
+
 fn present(result: &Classification) {
     if result.paths.is_empty() {
         println!("AUTONOMOUS — no changed files");
@@ -37,26 +57,6 @@ fn present(result: &Classification) {
         println!("{label} ({})", paths.len());
         for path in paths {
             println!("{path}");
-        }
-    }
-}
-
-fn run() -> Result<bool, String> {
-    let Arguments::Check { base, head } = Arguments::parse();
-    let directory = std::env::current_dir().map_err(|error| error.to_string())?;
-    let input = git::collect(&directory, &base, &head)?;
-    let result = evaluate(input)?;
-    present(&result);
-    Ok(result.requires_review())
-}
-
-fn main() -> ExitCode {
-    match run() {
-        Ok(false) => ExitCode::SUCCESS,
-        Ok(true) => ExitCode::from(1),
-        Err(error) => {
-            eprintln!("error: {error}");
-            ExitCode::from(2)
         }
     }
 }

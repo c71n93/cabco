@@ -4,43 +4,6 @@ use std::fs;
 use std::path::Path;
 use std::process::{Command, Output};
 
-fn git(directory: &Path, arguments: &[&str]) -> String {
-    let output = Command::new("git")
-        .current_dir(directory)
-        .args(arguments)
-        .output()
-        .unwrap();
-    let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(output.status.success(), "{stderr}");
-    String::from_utf8(output.stdout).unwrap().trim().into()
-}
-fn write(directory: &Path, path: &str, content: &str) {
-    let destination = directory.join(path);
-    if let Some(parent) = destination.parent() {
-        fs::create_dir_all(parent).unwrap();
-    }
-    fs::write(destination, content).unwrap();
-}
-fn commit(directory: &Path) -> String {
-    git(directory, &["add", "."]);
-    git(directory, &["commit", "-qm", "snapshot"]);
-    git(directory, &["rev-parse", "HEAD"])
-}
-fn repository() -> tempfile::TempDir {
-    let repo = tempfile::tempdir().unwrap();
-    git(repo.path(), &["init", "-q"]);
-    git(repo.path(), &["config", "user.email", "test@example.com"]);
-    git(repo.path(), &["config", "user.name", "CABCO Test"]);
-    repo
-}
-fn cabco(directory: &Path, base: &str, head: &str) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_cabco"))
-        .current_dir(directory)
-        .args(["check", "--base", base, "--head", head])
-        .output()
-        .unwrap()
-}
-
 #[test]
 fn divergent_committed_trees_supply_complete_collection_core_reasons_and_cli_output() {
     let repo = repository();
@@ -166,4 +129,41 @@ fn collection_and_argument_failures_identify_inputs_without_printing_a_verdict()
         assert_eq!(output.status.code(), Some(2));
         assert!(output.stdout.is_empty());
     }
+}
+
+fn write(directory: &Path, path: &str, content: &str) {
+    let destination = directory.join(path);
+    if let Some(parent) = destination.parent() {
+        fs::create_dir_all(parent).unwrap();
+    }
+    fs::write(destination, content).unwrap();
+}
+fn commit(directory: &Path) -> String {
+    git(directory, &["add", "."]);
+    git(directory, &["commit", "-qm", "snapshot"]);
+    git(directory, &["rev-parse", "HEAD"])
+}
+fn repository() -> tempfile::TempDir {
+    let repo = tempfile::tempdir().unwrap();
+    git(repo.path(), &["init", "-q"]);
+    git(repo.path(), &["config", "user.email", "test@example.com"]);
+    git(repo.path(), &["config", "user.name", "CABCO Test"]);
+    repo
+}
+fn cabco(directory: &Path, base: &str, head: &str) -> Output {
+    Command::new(env!("CARGO_BIN_EXE_cabco"))
+        .current_dir(directory)
+        .args(["check", "--base", base, "--head", head])
+        .output()
+        .unwrap()
+}
+fn git(directory: &Path, arguments: &[&str]) -> String {
+    let output = Command::new("git")
+        .current_dir(directory)
+        .args(arguments)
+        .output()
+        .unwrap();
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(output.status.success(), "{stderr}");
+    String::from_utf8(output.stdout).unwrap().trim().into()
 }
