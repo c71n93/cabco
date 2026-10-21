@@ -1,0 +1,66 @@
+id: rust-function-visibility-order
+language: Rust
+severity: error
+message: Place public functions before restricted functions, and private functions last.
+note: Keep relative order within each visibility group; move documentation and attributes with the function.
+ignores:
+  - '**/target/**'
+  - '**/generated/**'
+  - '**/*.generated.rs'
+utils:
+  public:
+    kind: function_item
+    has:
+      kind: visibility_modifier
+      regex: '^pub$'
+  restricted:
+    kind: function_item
+    has:
+      kind: visibility_modifier
+      not:
+        any:
+          - regex: '^pub$'
+          - pattern:
+              context: 'pub(self) fn f() {}'
+              selector: visibility_modifier
+              strictness: relaxed
+          - pattern:
+              context: 'pub(in self) fn f() {}'
+              selector: visibility_modifier
+              strictness: relaxed
+  private:
+    kind: function_item
+    not:
+      any:
+        - matches: public
+        - matches: restricted
+rule:
+  kind: function_item
+  # Direct parents and sibling traversal prevent comparisons across scopes.
+  inside:
+    any:
+      - kind: source_file
+      - kind: declaration_list
+        inside:
+          any:
+            - kind: mod_item
+            - kind: impl_item
+              not:
+                has:
+                  field: trait
+                  regex: '.'
+  not:
+    inside:
+      kind: function_item
+      stopBy: end
+  any:
+    - matches: private
+      precedes:
+        any:
+          - matches: public
+          - matches: restricted
+        stopBy: end
+    - matches: restricted
+      precedes:
+        matches: public
+        stopBy: end
