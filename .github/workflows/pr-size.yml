@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   enforce:
-    name: Enforce 500-line PR size limit
+    name: Enforce 255-line PR size limit
     runs-on: ubuntu-latest
     steps:
       - name: Label PR and enforce size ceiling
@@ -20,11 +20,11 @@ jobs:
         uses: CodelyTV/pr-size-labeler@19c335e7695ba922de938806dd129f0a9b992644
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          xs_max_size: 10
-          s_max_size: 100
-          m_max_size: 250
-          # The action uses strict less-than thresholds, so 501 permits 500.
-          l_max_size: 501
+          # Exclusive cutoffs: XS 0–15, S 16–63, M 64–127, L 128–255; XL fails.
+          xs_max_size: 16
+          s_max_size: 64
+          m_max_size: 128
+          l_max_size: 256
           fail_if_xl: true
           files_to_ignore: Cargo.lock
-          message_if_xl: "This PR exceeds the limit of 500 counted lines (additions plus deletions, excluding only the root Cargo.lock). Please split it into smaller, coherent changes with their relevant tests."
+          message_if_xl: "This PR exceeds the limit of 255 counted lines (additions plus deletions, excluding only the root Cargo.lock). Please split it into smaller, coherent changes with their relevant tests."
