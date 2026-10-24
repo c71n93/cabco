@@ -50,9 +50,21 @@ individual commits and does not run for direct pushes.
 
 ## Pull request size
 
-Pull requests may contain at most 500 changed lines, counted as additions plus
-deletions, with some exclusions defined in the workflow configuration. This
+Pull requests may contain at most 255 changed lines, counted as additions plus
+deletions, excluding only the root `Cargo.lock`. This
 maintenance ceiling applies regardless of maintenance ownership.
+
+The PR-size workflow assigns labels using these counted changed-line ranges:
+
+| Label | Changed lines |
+| --- | --- |
+| `size/xs` | 0–15 |
+| `size/s` | 16–63 |
+| `size/m` | 64–127 |
+| `size/l` | 128–255 |
+| `size/xl` | 256 or more (check fails) |
+
+The labeler's configured cutoffs are exclusive: 16, 64, 128, and 256.
 
 Agents must plan smaller, coherent implementation increments, each accompanied
 by its relevant tests, rather than presenting an oversized change for review.
